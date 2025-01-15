@@ -48,12 +48,13 @@ contract LilouCoin is IERC20 {
     }
 
     function transferFrom(address from, address to, uint256 value) external override returns (bool) {
-        uint256 allowanceValue = _allowances[msg.sender][from];
+        uint256 allowanceValue = _allowances[from][msg.sender];
 
 
         if (allowanceValue < value) {
             revert NotAllowed(msg.sender, from, allowanceValue, value);
         }
+        _allowances[from][msg.sender] -= value;
         return _transfer(from, to, value);
     }
 
