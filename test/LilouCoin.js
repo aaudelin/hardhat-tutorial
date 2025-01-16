@@ -17,8 +17,6 @@ async function deployLilouCoinFixture() {
     "0x1000000000000000000000000",
   ]);
 
-  console.log(owner.address);
-
   const lilouCoin = await ethers.deployContract("LilouCoin");
 
   await lilouCoin.waitForDeployment();
