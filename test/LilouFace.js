@@ -95,7 +95,7 @@ describe("LilouFace contract", function () {
     );
   });
 
-  it("Should revert id the to address is the Zero Address", async function () {
+  it("Should revert transferFrom if the to address is the Zero Address", async function () {
     const { lilouFace, holder, holderNFTId } = await loadFixture(
       deployLilouFaceFixture
     );
@@ -109,7 +109,7 @@ describe("LilouFace contract", function () {
       .withArgs(ethers.ZeroAddress);
   });
 
-  it("Should revert if the NFT is not found", async function () {
+  it("Should revert transferFrom if the NFT is not found", async function () {
     const { lilouFace, holder, owner } = await loadFixture(
       deployLilouFaceFixture
     );
@@ -124,7 +124,7 @@ describe("LilouFace contract", function () {
       .withArgs(notFoundNFT);
   });
 
-  it("Should revert if not the owner", async function () {
+  it("Should revert transferFrom if sender is not the owner", async function () {
     const { lilouFace, holder, addr1, holderNFTId } = await loadFixture(
       deployLilouFaceFixture
     );
@@ -138,7 +138,7 @@ describe("LilouFace contract", function () {
       .withArgs(addr1.address, addr1.address, holderNFTId);
   });
 
-  it("Should revert if sender is not the owner or approved", async function () {
+  it("Should revert transferFrom if sender is not the owner or approved", async function () {
     const { lilouFace, holder, addr1, holderNFTId } = await loadFixture(
       deployLilouFaceFixture
     );
@@ -150,5 +150,125 @@ describe("LilouFace contract", function () {
     )
       .to.be.revertedWithCustomError(lilouFace, "UnauthorizedAddress")
       .withArgs(holder.address, addr1.address, holderNFTId);
+  });
+
+  it("Should approve the address to transfer the NFT", async function () {
+    const { lilouFace, holder, addr1, holderNFTId, owner } = await loadFixture(
+      deployLilouFaceFixture
+    );
+
+    await expect(lilouFace.connect(holder).approve(addr1.address, holderNFTId))
+      .to.emit(lilouFace, "Approval")
+      .withArgs(holder.address, addr1.address, holderNFTId);
+
+    const approved = await lilouFace.getApproved(holderNFTId);
+    expect(approved).to.equal(addr1.address);
+
+    await expect(
+      lilouFace
+        .connect(addr1)
+        .transferFrom(holder.address, owner.address, holderNFTId)
+    )
+      .to.emit(lilouFace, "Transfer")
+      .withArgs(holder.address, owner.address, holderNFTId);
+  });
+
+  it("Should revert the approval if the sender is not the owner or approved", async function () {
+    const { lilouFace, addr1, holderNFTId } = await loadFixture(
+      deployLilouFaceFixture
+    );
+
+    await expect(
+      lilouFace.connect(addr1).approve(addr1.address, holderNFTId)
+    ).to.be.revertedWithCustomError(lilouFace, "UnauthorizedAddress");
+  });
+
+  it("Should set the approval for all tokens", async function () {
+    const { lilouFace, holder, addr1 } = await loadFixture(
+      deployLilouFaceFixture
+    );
+
+    const isApprovedNew = true;
+    await expect(
+      lilouFace.connect(holder).setApprovalForAll(addr1.address, isApprovedNew)
+    )
+      .to.emit(lilouFace, "ApprovalForAll")
+      .withArgs(holder.address, addr1.address, isApprovedNew);
+
+    const isApproved = await lilouFace.isApprovedForAll(
+      holder.address,
+      addr1.address
+    );
+    expect(isApproved).to.equal(isApprovedNew);
+  });
+
+  it("Should revert the approval for all tokens if the operator is the zero address", async function () {
+    const { lilouFace } = await loadFixture(deployLilouFaceFixture);
+
+    await expect(
+      lilouFace.setApprovalForAll(ethers.ZeroAddress, true)
+    ).to.be.revertedWithCustomError(lilouFace, "InvalidAddress");
+  });
+
+  it("Should transfer the NFT from the holder to the new owner if the approval for all is set", async function () {
+    const { lilouFace, holder, addr1, holderNFTId } = await loadFixture(
+      deployLilouFaceFixture
+    );
+
+    await lilouFace.connect(holder).setApprovalForAll(addr1.address, true);
+
+    await expect(
+      lilouFace
+        .connect(addr1)
+        .transferFrom(holder.address, addr1.address, holderNFTId)
+    )
+      .to.emit(lilouFace, "Transfer")
+      .withArgs(holder.address, addr1.address, holderNFTId);
+  });
+
+  it("Should approve the address to transfer the NFT if the approval for all is set", async function () {
+    const { lilouFace, holder, addr1, holderNFTId } = await loadFixture(
+      deployLilouFaceFixture
+    );
+
+    await lilouFace.connect(holder).setApprovalForAll(addr1.address, true);
+
+    await expect(lilouFace.connect(addr1).approve(addr1.address, holderNFTId))
+      .to.emit(lilouFace, "Approval")
+      .withArgs(holder.address, addr1.address, holderNFTId);
+  });
+
+  it("Should return the approved address for a token", async function () {
+    const { lilouFace, holder, addr1, holderNFTId } = await loadFixture(
+      deployLilouFaceFixture
+    );
+
+    await lilouFace.connect(holder).approve(addr1.address, holderNFTId);
+
+    const approved = await lilouFace.getApproved(holderNFTId);
+    expect(approved).to.equal(addr1.address);
+  });
+
+  it("Should revert the getApproved if the NFT is not found", async function () {
+    const { lilouFace } = await loadFixture(deployLilouFaceFixture);
+    const notFoundNFT = 999999;
+
+    await expect(lilouFace.getApproved(notFoundNFT))
+      .to.be.revertedWithCustomError(lilouFace, "InvalidNft")
+      .withArgs(notFoundNFT);
+  });
+
+  it("Should return true if the approval for all is set", async function () {
+    const { lilouFace, holder, addr1 } = await loadFixture(
+      deployLilouFaceFixture
+    );
+
+    await lilouFace.connect(holder).setApprovalForAll(addr1.address, true);
+
+    const isApproved = await lilouFace.isApprovedForAll(
+      holder.address,
+      addr1.address
+    );
+    expect(isApproved).to.equal(true);
   });
 });
