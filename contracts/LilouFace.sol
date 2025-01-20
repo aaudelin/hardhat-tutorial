@@ -2,11 +2,13 @@
 pragma solidity 0.8.28;
 
 import { ERC721 as IERC721 } from "./interface/IERC721.sol";
+import "hardhat/console.sol";
 
 contract LilouFace is IERC721 {
     error InvalidAddress(address account);
     error InvalidNft(uint256 tokenId);
     error UnauthorizedAddress(address owner, address operator, uint256 tokenId);
+    error WrongOwner(address owner, address operator, uint256 tokenId);
 
     mapping(address owner => uint256 tokensCount) private _balances;
     mapping(uint256 tokenId => address owner) private _owners;
@@ -43,8 +45,10 @@ contract LilouFace is IERC721 {
         if (_owners[_tokenId] == address(0)) {
             revert InvalidNft(_tokenId);
         }
-        if (_from != _owners[_tokenId]
-            && msg.sender != _owners[_tokenId] 
+        if (_from != _owners[_tokenId]) {
+            revert WrongOwner(_from, msg.sender, _tokenId);
+        }
+        if (msg.sender != _owners[_tokenId] 
             && msg.sender != _approvals[_tokenId] 
             && _operators[_from][msg.sender] == false
         ) {
