@@ -3,8 +3,7 @@ const { expect } = require("chai");
 const {
   loadFixture,
 } = require("@nomicfoundation/hardhat-toolbox/network-helpers");
-const { ethers } = require("hardhat");
-const { network } = require("hardhat");
+const { ethers, network } = require("hardhat");
 
 async function deployLilouFaceFixture() {
   const [owner, addr1, addr2] = await ethers.getSigners();
