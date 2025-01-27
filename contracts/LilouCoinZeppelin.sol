@@ -10,4 +10,14 @@ contract LilouCoinZeppelin is ERC20 {
         _mint(0x73096Ed178C96e7096Ad3329Fd092be3D16A725E, 21_000_000 * (10 ** decimals()));
     }
 
+    // For testing purposes, how can we test internal functions?
+    function mint(address account, uint256 value) external {
+        _mint(account, value);
+    }
+
+    // For testing purposes, how can we test internal functions?
+    function burn(address account, uint256 value) external {
+        _burn(account, value);
+    }
+
 }
