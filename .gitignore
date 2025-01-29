@@ -5,3 +5,5 @@ cache
 ignition/deployments/chain-11155111/artifacts
 ignition/deployments/chain-11155111/build-info
 ignition/deployments/chain-11155111/journal.jsonl
+
+typechain-types

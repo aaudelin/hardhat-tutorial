@@ -2,6 +2,7 @@ import { expect } from "chai";
 
 import { loadFixture } from "@nomicfoundation/hardhat-toolbox/network-helpers";
 import { ethers, network } from "hardhat";
+import { LilouCoin } from "../typechain-types/contracts/LilouCoin";
 
 async function deployLilouCoinFixture() {
   const [owner, addr1, addr2] = await ethers.getSigners();
@@ -14,7 +15,7 @@ async function deployLilouCoinFixture() {
     "0x1000000000000000000000000",
   ]);
 
-  const lilouCoin = await ethers.deployContract("LilouCoin");
+  const lilouCoin = await ethers.deployContract("LilouCoin") as LilouCoin;
 
   await lilouCoin.waitForDeployment();
 
