@@ -28,42 +28,52 @@ async function deployLilouCoinFixture() {
   };
 }
 
-describe("LilouCoin contract refactored", function () {
+describe("LilouCoin - test total supply ", function () {
   it("Should get the total supply of the token", async function () {
     const { lilouCoin } = await loadFixture(deployLilouCoinFixture);
 
     const totalSupply = await lilouCoin.totalSupply();
     expect(totalSupply).to.equal(42_000_000_00);
   });
+});
 
+describe("LilouCoin - test current balance of one of the holders", function () {
   it("Should get the current balance of one of the holders", async function () {
     const { lilouCoin, holder } = await loadFixture(deployLilouCoinFixture);
 
     const balance = await lilouCoin.balanceOf(holder);
     expect(balance).to.equal(21_000_000_00);
   });
+});
 
+describe("LilouCoin - test name", function () {
   it("Should get the name of the token", async function () {
     const { lilouCoin } = await loadFixture(deployLilouCoinFixture);
 
     const name = await lilouCoin.name();
     expect(name).to.equal("Lilou Coin");
   });
+});
 
+describe("LilouCoin - test symbol", function () {
   it("Should get the symbol of the token", async function () {
     const { lilouCoin } = await loadFixture(deployLilouCoinFixture);
 
     const symbol = await lilouCoin.symbol();
     expect(symbol).to.equal("LLC");
   });
+});
 
+describe("LilouCoin - test decimals", function () {
   it("Should get the decimals of the token", async function () {
     const { lilouCoin } = await loadFixture(deployLilouCoinFixture);
 
     const decimals = await lilouCoin.decimals();
     expect(decimals).to.equal(2);
   });
+});
 
+describe("LilouCoin - test approval", function () {
   it("Should send an approval event when an address is approved to spend on behalf of the owner", async function () {
     const { lilouCoin, owner, holder } = await loadFixture(
       deployLilouCoinFixture
@@ -88,7 +98,9 @@ describe("LilouCoin contract refactored", function () {
     const allowance = await lilouCoin.allowance(owner.address, holder.address);
     expect(allowance).to.equal(allowedAmount);
   });
+});
 
+describe("LilouCoin - test transfer", function () {
   it("Should send a transfer event when a transfer is made", async function () {
     const { lilouCoin, owner, holder } = await loadFixture(
       deployLilouCoinFixture
