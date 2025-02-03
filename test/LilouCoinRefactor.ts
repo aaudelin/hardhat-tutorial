@@ -33,7 +33,10 @@ describe("LilouCoin refactored tests", function () {
       expect(balance).to.equal(21_000_000_00);
     });
 
-    it("Should return 0 if the address has no balance", async function () {});
+    it("Should return 0 if the address has no balance", async function () {
+      const balance = await lilouCoin.balanceOf(addr1);
+      expect(balance).to.equal(0);
+    });
   });
 
   describe("Test name", function () {
@@ -59,7 +62,6 @@ describe("LilouCoin refactored tests", function () {
 
   describe("Test approval", function () {
     it("Should send an approval event when an address is approved to spend on behalf of the owner", async function () {
-
       const allowedAmount = 1000_00;
 
       await expect(lilouCoin.approve(holder.address, allowedAmount))
@@ -78,6 +80,19 @@ describe("LilouCoin refactored tests", function () {
         holder.address
       );
       expect(allowance).to.equal(allowedAmount);
+    });
+
+    it("Should erase the previous allowance if a new allowance is made", async function () {
+      const firstAmount = 1000_00;
+      await lilouCoin.approve(holder.address, firstAmount);
+      const firstAllowance = await lilouCoin.allowance(owner.address, holder.address);
+      
+      const secondAmount = 2000_00;
+      await lilouCoin.approve(holder.address, secondAmount);
+      const secondAllowance = await lilouCoin.allowance(owner.address, holder.address);
+      
+      expect(secondAllowance).to.equal(secondAmount);
+      expect(secondAllowance).to.not.equal(firstAllowance);
     });
   });
 
