@@ -1,6 +1,6 @@
 import { expect } from "chai";
 
-import { SignerWithAddress, } from "@nomicfoundation/hardhat-ethers/signers";
+import { SignerWithAddress } from "@nomicfoundation/hardhat-ethers/signers";
 import { ethers } from "hardhat";
 import { LilouCoin } from "../typechain-types/contracts/LilouCoin";
 
@@ -10,7 +10,7 @@ describe("LilouCoin refactored tests", function () {
   let addr2: SignerWithAddress;
   let holder: SignerWithAddress;
   let lilouCoin: LilouCoin;
-  
+
   before(async function () {
     [owner, addr1, addr2, holder] = await ethers.getSigners();
   });
@@ -125,7 +125,6 @@ describe("LilouCoin refactored tests", function () {
 
   describe("Test transfer", function () {
     it("Should send a transfer event when a transfer is made", async function () {
-      
       const transferAmount = 1000_00;
       
       await expect(
@@ -133,6 +132,28 @@ describe("LilouCoin refactored tests", function () {
       )
       .to.emit(lilouCoin, "Transfer")
       .withArgs(holder.address, owner.address, transferAmount);
+    });
+
+    it("Should revert if the sender does not have enough funds", async function () {
+      const transferAmount = 22_000_000_00;
+      const holderBalance = await lilouCoin.balanceOf(holder.address);
+      await expect(
+        lilouCoin.connect(holder).transfer(owner.address, transferAmount)
+      )
+        .to.be.revertedWithCustomError(lilouCoin, "InsufficientFunds")
+        .withArgs(holder.address, holderBalance, transferAmount);
+    });
+
+    it("Should decrease the balance of the sender and increase the balance of the recipient", async function () {
+      const transferAmount = ethers.toBigInt(1000_00);
+      const holderBalance = await lilouCoin.balanceOf(holder.address);
+
+      await lilouCoin.connect(holder).transfer(addr1.address, transferAmount);
+      const newHolderBalance = await lilouCoin.balanceOf(holder.address);
+      expect(newHolderBalance).to.equal(holderBalance - transferAmount);
+
+      const receiverBalance = await lilouCoin.balanceOf(addr1.address);
+      expect(receiverBalance).to.equal(transferAmount);
     });
   });
 
