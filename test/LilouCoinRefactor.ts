@@ -82,6 +82,22 @@ describe("LilouCoin refactored tests", function () {
       );
       expect(allowance).to.equal(allowedAmount);
     });
+
+    it("Should return 0 if the requested owner is the ZeroAddress", async function () {
+      const allowance = await lilouCoin.allowance(
+        ethers.ZeroAddress,
+        holder.address
+      );
+      expect(allowance).to.equal(0);
+    });
+
+    it("Should return 0 if the requested spender is the ZeroAddress", async function () {
+      const allowance = await lilouCoin.allowance(
+        owner.address,
+        ethers.ZeroAddress
+      );
+      expect(allowance).to.equal(0);
+    });
   });
 
   describe("Test approval", function () {
