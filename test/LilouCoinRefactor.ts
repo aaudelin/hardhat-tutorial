@@ -60,13 +60,14 @@ describe("LilouCoin refactored tests", function () {
     });
   });
 
-  describe("Test approval", function () {
-    it("Should send an approval event when an address is approved to spend on behalf of the owner", async function () {
-      const allowedAmount = 1000_00;
+  describe("Test allowance", function() {
+    it("Should return 0 if there is no allowance", async function () {
 
-      await expect(lilouCoin.approve(holder.address, allowedAmount))
-        .to.emit(lilouCoin, "Approval")
-        .withArgs(owner.address, holder.address, allowedAmount);
+      const allowance = await lilouCoin.allowance(
+        owner.address,
+        holder.address
+      );
+      expect(allowance).to.equal(0);
     });
 
     it("Should get the allowance of the owner once another address is approved to spend on his behalf", async function () {
@@ -80,6 +81,16 @@ describe("LilouCoin refactored tests", function () {
         holder.address
       );
       expect(allowance).to.equal(allowedAmount);
+    });
+  });
+
+  describe("Test approval", function () {
+    it("Should send an approval event when an address is approved to spend on behalf of the owner", async function () {
+      const allowedAmount = 1000_00;
+
+      await expect(lilouCoin.approve(holder.address, allowedAmount))
+        .to.emit(lilouCoin, "Approval")
+        .withArgs(owner.address, holder.address, allowedAmount);
     });
 
     it("Should erase the previous allowance if a new allowance is made", async function () {
@@ -98,16 +109,18 @@ describe("LilouCoin refactored tests", function () {
 
   describe("Test transfer", function () {
     it("Should send a transfer event when a transfer is made", async function () {
-
+      
       const transferAmount = 1000_00;
-
+      
       await expect(
         lilouCoin.connect(holder).transfer(owner.address, transferAmount)
       )
-        .to.emit(lilouCoin, "Transfer")
-        .withArgs(holder.address, owner.address, transferAmount);
+      .to.emit(lilouCoin, "Transfer")
+      .withArgs(holder.address, owner.address, transferAmount);
     });
+  });
 
+  describe("Test transferFrom", function () {
     it("Should revert if the spender does not have enough allowance", async function () {
 
       const allowedAmount = 500_00;
