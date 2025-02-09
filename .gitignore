@@ -7,3 +7,6 @@ ignition/deployments/chain-11155111/build-info
 ignition/deployments/chain-11155111/journal.jsonl
 
 typechain-types
+
+cache_forge
+out

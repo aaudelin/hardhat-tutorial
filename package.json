@@ -7,10 +7,13 @@
   "type": "commonjs",
   "main": "index.js",
   "scripts": {
-    "test": "npx hardhat test",
-    "compile": "npx hardhat compile"
+    "hardhat:compile": "npx hardhat compile",
+    "hardhat:test": "npx hardhat test",
+    "foundry:compile": "forge build",
+    "foundry:test": "forge test"
   },
   "devDependencies": {
+    "@nomicfoundation/hardhat-foundry": "^1.1.3",
     "@nomicfoundation/hardhat-toolbox": "^5.0.0",
     "@openzeppelin/contracts": "^5.1.0",
     "@typechain/ethers-v6": "^0.5.1",
