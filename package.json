@@ -7,6 +7,8 @@
   "type": "commonjs",
   "main": "index.js",
   "scripts": {
+    "compile": "npx hardhat compile && forge build",
+    "test": "npx hardhat test && forge test",
     "hardhat:compile": "npx hardhat compile",
     "hardhat:test": "npx hardhat test",
     "foundry:compile": "forge build",
