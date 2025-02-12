@@ -15,14 +15,20 @@ contract LilouCoinRefactor is IERC20 {
     error InsufficientFunds(address from, uint256 remainingFunds, uint256 expectedValue);
     error NotAllowed(address spender, address owner, uint256 remainingFunds, uint256 expectedtransfer);
 
-    constructor(address holder1, address holder2) {
+    constructor(address[] memory holders) {
         symbol = "LLC";
         name = "Lilou Coin";
         decimals = 2;
-        _totalSupply = 42_000_000 * (10 ** decimals);
-        _balances[holder1] = _totalSupply/2;
-        _balances[holder2] = _totalSupply/2;
-        emit Transfer(address(0), address(this), _totalSupply);
+        uint256 providedSupply = (42_000_000 * (10 ** decimals))/holders.length;
+        for (uint256 i = 0; i < holders.length; i++) {
+            mint(holders[i], providedSupply);
+        }
+    }
+
+    function mint(address to, uint256 value) private {
+        _balances[to] += value;
+        _totalSupply += value;
+        emit Transfer(address(0), to, value);
     }
 
     function totalSupply() external view override returns (uint256) {

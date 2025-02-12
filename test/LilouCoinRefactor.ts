@@ -17,7 +17,7 @@ describe("LilouCoin refactored tests", function () {
   
   beforeEach(async function () {
     const LilouToken = await ethers.getContractFactory('LilouCoinRefactor');
-    lilouCoin = (await LilouToken.deploy(owner.address, holder.address)) as LilouCoin;
+    lilouCoin = (await LilouToken.deploy([owner.address, holder.address])) as LilouCoin;
   });
 
   describe("Test total supply ", function () {

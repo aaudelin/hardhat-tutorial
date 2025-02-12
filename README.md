@@ -8,3 +8,7 @@ npx hardhat ignition deploy ignition/modules/Apollo.js --network sepolia --verif
 ```bash
 forge install --no-commit foundry-rs/forge-std
 ```
+## Install foundry
+```bash
+curl -L https://foundry.paradigm.xyz | bash
+```
